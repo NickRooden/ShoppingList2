@@ -6,20 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.myrood.shoppinglist2.R
 import com.myrood.shoppinglist2.domain.ShopItem
 
-class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>() {
+class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder>(ItemCallBack()) {
 
-    var shopList = listOf<ShopItem>()
-    set(value) {
-        val shopItemCallBack = ShopItemCallBack(shopList, value)
-        val resultDiff = DiffUtil.calculateDiff(shopItemCallBack)
-        resultDiff.dispatchUpdatesTo(this)
-
-        field = value
-    }
+ //   var shopList = listOf<ShopItem>()
+//    set(value) {
+//        val shopItemCallBack = ShopItemCallBack(shopList, value)
+//        val resultDiff = DiffUtil.calculateDiff(shopItemCallBack)
+//        resultDiff.dispatchUpdatesTo(this)
+//
+//        field = value
+//    }
 
     var howmach = 0
 
@@ -38,7 +39,9 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 
     override fun onBindViewHolder(viewHolder: ShopItemViewHolder, position: Int) {
         Log.d("onbindviewholder", "how mach - ${howmach++}")
-        val shopItem = shopList[position]
+
+        //getItem onplace of shopList
+        val shopItem = getItem(position)
         viewHolder.viewName.text = shopItem.name
         viewHolder.viewCount.text = shopItem.count.toString()
 
@@ -52,7 +55,7 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
     }
 
     override fun getItemViewType(position: Int): Int {
-        val item = shopList[position]
+        val item = getItem(position)
         return if (item.enable){
             ENABLED_ITEM
         }else{
@@ -60,9 +63,6 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
         }
     }
 
-    override fun getItemCount(): Int {
-        return shopList.size
-    }
 
     class ShopItemViewHolder(val view: View) : RecyclerView.ViewHolder(view){
         val viewName = view.findViewById<TextView>(R.id.nameId)

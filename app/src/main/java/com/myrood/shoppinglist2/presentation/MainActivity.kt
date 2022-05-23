@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.myrood.shoppinglist2.R
+import com.myrood.shoppinglist2.domain.ShopItem
 import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.DESABLED_ITEM
 import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.ENABLED_ITEM
 import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.MAX_POOL
@@ -49,7 +50,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val item = shopListAdapter.shopList[viewHolder.adapterPosition]
+                //currentList on place of shopList
+                val item = shopListAdapter.currentList[viewHolder.adapterPosition]
                 viewModel.deleteShopItem(item)
             }
 
@@ -60,7 +62,8 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shList.observe(this){
 
-            shopListAdapter.shopList = it
+            //submitList on place shopList
+            shopListAdapter.submitList(it)
             Log.d("shList", it.toString())
         }
     }
