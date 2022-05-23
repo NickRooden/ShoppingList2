@@ -1,9 +1,11 @@
 package com.myrood.shoppinglist2.presentation
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.myrood.shoppinglist2.R
 import com.myrood.shoppinglist2.domain.ShopItem
@@ -12,9 +14,14 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 
     var shopList = listOf<ShopItem>()
     set(value) {
+        val shopItemCallBack = ShopItemCallBack(shopList, value)
+        val resultDiff = DiffUtil.calculateDiff(shopItemCallBack)
+        resultDiff.dispatchUpdatesTo(this)
+
         field = value
-        notifyDataSetChanged()
     }
+
+    var howmach = 0
 
     var onShopItemLongClickListener : ((ShopItem) -> Unit)? = null
     var onShopItemClickListener : ((ShopItem) -> Unit)? = null
@@ -30,6 +37,7 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
     }
 
     override fun onBindViewHolder(viewHolder: ShopItemViewHolder, position: Int) {
+        Log.d("onbindviewholder", "how mach - ${howmach++}")
         val shopItem = shopList[position]
         viewHolder.viewName.text = shopItem.name
         viewHolder.viewCount.text = shopItem.count.toString()
