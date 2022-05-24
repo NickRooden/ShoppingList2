@@ -3,10 +3,12 @@ package com.myrood.shoppinglist2.presentation
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.myrood.shoppinglist2.R
 import com.myrood.shoppinglist2.domain.ShopItem
 import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.DESABLED_ITEM
@@ -34,13 +36,37 @@ class MainActivity : AppCompatActivity() {
             viewModel.changeEnableState(it)
 
         }
+
         shopListAdapter.onShopItemClickListener = {
-            //viewModel.
+
+            val intent = ShopItemActivity.intentCreateModeEdit(this, it.id)
+            startActivity(intent)
+
         }
+
+        actionOnSwipe(recyclerView)
+
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        viewModel.shList.observe(this){
+
+            //submitList on place shopList
+            shopListAdapter.submitList(it)
+            Log.d("shList", it.toString())
+        }
+
+        val addBtn = findViewById<FloatingActionButton>(R.id.shopItem_add_btn)
+        addBtn.setOnClickListener {
+            val intent = ShopItemActivity.intentCreateModeAdd(this)
+            startActivity(intent)
+        }
+
+    }
+
+    private fun actionOnSwipe(recyclerView: RecyclerView) {
         val callback = object : ItemTouchHelper.SimpleCallback(
             0,
             ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
-        ){
+        ) {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -58,13 +84,5 @@ class MainActivity : AppCompatActivity() {
         }
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        viewModel.shList.observe(this){
-
-            //submitList on place shopList
-            shopListAdapter.submitList(it)
-            Log.d("shList", it.toString())
-        }
     }
 }
