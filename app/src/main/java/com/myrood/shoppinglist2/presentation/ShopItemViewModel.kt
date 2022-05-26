@@ -34,7 +34,7 @@ class ShopItemViewModel : ViewModel() {
         get() = _finishScreen
 
 
-    fun addShopItem(inputName: String?, inputCount: String?){
+    fun editShopItem(inputName: String?, inputCount: String?){
 
         val name = parseName(inputName)
         val count = parseCount(inputCount)
@@ -43,19 +43,19 @@ class ShopItemViewModel : ViewModel() {
             val shopItem = _shopItem.value
             shopItem?.let {
                 val item = it.copy(name = name, count = count)
-                addShopItemUseCase.addShopItem(item)
+                editShopItemUseCase.editShopItem(item)
                 _finishScreen.value = Unit
             }
         }
     }
-    fun editShopItem(inputName: String?, inputCount: String?){
+    fun addShopItem(inputName: String?, inputCount: String?){
 
         val name = parseName(inputName)
         val count = parseCount(inputCount)
         val validation = validateInput(name, count)
         if (validation){
             val shopItem = ShopItem(name, count, true)
-            editShopItemUseCase.editShopItem(shopItem)
+            addShopItemUseCase.addShopItem(shopItem)
 
         }
         _finishScreen.value = Unit
@@ -72,15 +72,9 @@ class ShopItemViewModel : ViewModel() {
         }catch (e: Exception){
             0
         }
-
-
     }
 
-    private fun parseName(inputName: String?): String {
-
-        return inputName?.trim()?:""
-
-    }
+    private fun parseName(inputName: String?) = inputName?.trim()?:""
 
     private fun validateInput(name: String, count: Int): Boolean{
 
