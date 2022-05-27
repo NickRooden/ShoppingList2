@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
+import androidx.fragment.app.FragmentContainer
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,10 +18,11 @@ import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.DESABLED_
 import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.ENABLED_ITEM
 import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.MAX_POOL
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
+    private var fragmentContainer: FragmentContainerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +36,8 @@ class MainActivity : AppCompatActivity() {
         recyclerView.recycledViewPool.setMaxRecycledViews(ENABLED_ITEM, MAX_POOL)
         recyclerView.recycledViewPool.setMaxRecycledViews(DESABLED_ITEM, MAX_POOL)
 
+        val isLandOrient = isLandOrient()
+
         shopListAdapter.onShopItemLongClickListener = {
             viewModel.changeEnableState(it)
 
@@ -39,8 +45,15 @@ class MainActivity : AppCompatActivity() {
 
         shopListAdapter.onShopItemClickListener = {
 
-            val intent = ShopItemActivity.intentCreateModeEdit(this, it.id)
-            startActivity(intent)
+            if (isLandOrient){
+
+                launchFragment(ShopItemFragment.instFragmentEditMode(it.id))
+
+            }else{
+                val intent = ShopItemActivity.intentCreateModeEdit(this, it.id)
+                startActivity(intent)
+            }
+
 
         }
 
@@ -55,11 +68,33 @@ class MainActivity : AppCompatActivity() {
         }
 
         val addBtn = findViewById<FloatingActionButton>(R.id.shopItem_add_btn)
+
         addBtn.setOnClickListener {
-            val intent = ShopItemActivity.intentCreateModeAdd(this)
-            startActivity(intent)
+
+            if (isLandOrient){
+
+                launchFragment(ShopItemFragment.instFragmentAddMode())
+
+            }else{
+                val intent = ShopItemActivity.intentCreateModeAdd(this)
+                startActivity(intent)
+            }
+
         }
 
+    }
+
+    private fun launchFragment(fragment: ShopItemFragment){
+        supportFragmentManager.popBackStack()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_ac_frag_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun isLandOrient(): Boolean{
+        fragmentContainer = findViewById(R.id.main_ac_frag_container)
+       return fragmentContainer != null
     }
 
     private fun actionOnSwipe(recyclerView: RecyclerView) {
@@ -84,5 +119,10 @@ class MainActivity : AppCompatActivity() {
         }
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    override fun onEditingFinished() {
+        Toast.makeText(this,"Success!", Toast.LENGTH_LONG).show()
+        supportFragmentManager.popBackStack()
     }
 }
