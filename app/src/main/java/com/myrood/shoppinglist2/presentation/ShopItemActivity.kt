@@ -12,6 +12,7 @@ import android.widget.EditText
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import com.myrood.shoppinglist2.R
+import com.myrood.shoppinglist2.databinding.ActivityShopItemBinding
 import com.myrood.shoppinglist2.domain.ShopItem
 
 class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
@@ -20,9 +21,12 @@ class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinished
     private var screenMode = SCREEN_MODE_EMPTY
     private var itemId = ShopItem.UNDEFINED_ID
 
+    private lateinit var binding: ActivityShopItemBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_shop_item)
+        binding = ActivityShopItemBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         checkMode()
 
@@ -57,8 +61,6 @@ class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinished
                 throw RuntimeException("itemId is UNDEFINED_ID")
             }
         }
-
-
     }
 
     companion object{

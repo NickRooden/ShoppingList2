@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.myrood.shoppinglist2.R
+import com.myrood.shoppinglist2.databinding.ActivityMainBinding
 import com.myrood.shoppinglist2.domain.ShopItem
 import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.DESABLED_ITEM
 import com.myrood.shoppinglist2.presentation.ShopListAdapter.Companion.ENABLED_ITEM
@@ -24,17 +25,23 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
     private lateinit var shopListAdapter: ShopListAdapter
     private var fragmentContainer: FragmentContainerView? = null
 
+    private lateinit var binding : ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         shopListAdapter = ShopListAdapter()
-        val recyclerView = findViewById<RecyclerView>(R.id.shop_list_rv)
-        recyclerView.adapter = shopListAdapter
         //val lM = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        //recyclerView.setLayoutManager(lM)
-        recyclerView.recycledViewPool.setMaxRecycledViews(ENABLED_ITEM, MAX_POOL)
-        recyclerView.recycledViewPool.setMaxRecycledViews(DESABLED_ITEM, MAX_POOL)
+        with(binding.shopListRv){
+            adapter = shopListAdapter
+            recycledViewPool.setMaxRecycledViews(ENABLED_ITEM, MAX_POOL)
+            recycledViewPool.setMaxRecycledViews(DESABLED_ITEM, MAX_POOL)
+            //setLayoutManager(lM)
+        }
+
+
 
         val isLandOrient = isLandOrient()
 
@@ -57,7 +64,7 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
 
         }
 
-        actionOnSwipe(recyclerView)
+        actionOnSwipe(binding.shopListRv)
 
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shList.observe(this){
@@ -67,9 +74,9 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
             Log.d("shList", it.toString())
         }
 
-        val addBtn = findViewById<FloatingActionButton>(R.id.shopItem_add_btn)
 
-        addBtn.setOnClickListener {
+
+        binding.shopItemAddBtn.setOnClickListener {
 
             if (isLandOrient){
 
@@ -93,8 +100,8 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
     }
 
     private fun isLandOrient(): Boolean{
-        fragmentContainer = findViewById(R.id.main_ac_frag_container)
-       return fragmentContainer != null
+        //fragmentContainer = findViewById(R.id.main_ac_frag_container)
+       return binding.mainAcFragContainer != null
     }
 
     private fun actionOnSwipe(recyclerView: RecyclerView) {

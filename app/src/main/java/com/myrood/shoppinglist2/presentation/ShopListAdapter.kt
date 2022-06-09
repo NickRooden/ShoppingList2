@@ -5,22 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.myrood.shoppinglist2.R
+import com.myrood.shoppinglist2.databinding.ShopItemDisabledBinding
+import com.myrood.shoppinglist2.databinding.ShopItemEnabledBinding
 import com.myrood.shoppinglist2.domain.ShopItem
 
 class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder>(ItemCallBack()) {
 
- //   var shopList = listOf<ShopItem>()
-//    set(value) {
-//        val shopItemCallBack = ShopItemCallBack(shopList, value)
-//        val resultDiff = DiffUtil.calculateDiff(shopItemCallBack)
-//        resultDiff.dispatchUpdatesTo(this)
-//
-//        field = value
-//    }
 
     var howmach = 0
 
@@ -33,8 +30,12 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
             DESABLED_ITEM -> R.layout.shop_item_disabled
             else -> throw RuntimeException ("Type of ShopItem is wrong")
         }
-        val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
-        return ShopItemViewHolder(view)
+        val binding = DataBindingUtil.inflate<ViewDataBinding>(
+            LayoutInflater.from(parent.context),
+            layout,
+            parent,false
+        )
+        return ShopItemViewHolder(binding)
     }
 
     override fun onBindViewHolder(viewHolder: ShopItemViewHolder, position: Int) {
@@ -42,14 +43,31 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
 
         //getItem onplace of shopList
         val shopItem = getItem(position)
-        viewHolder.viewName.text = shopItem.name
-        viewHolder.viewCount.text = shopItem.count.toString()
 
-        viewHolder.itemView.setOnLongClickListener {
+        val binding = viewHolder.binding
+
+        when (binding){
+            is ShopItemEnabledBinding -> {
+                with(binding){
+
+                    nameId.text = shopItem.name
+                    countId.text = shopItem.count.toString()
+                }
+
+            }
+            is ShopItemDisabledBinding -> {
+                with(binding){
+
+                    nameId.text = shopItem.name
+                    countId.text = shopItem.count.toString()
+                }
+            }
+        }
+        binding.root.setOnLongClickListener {
             onShopItemLongClickListener?.invoke(shopItem)
             true
         }
-        viewHolder.itemView.setOnClickListener {
+        binding.root.setOnClickListener {
             onShopItemClickListener?.invoke(shopItem)
         }
     }
@@ -64,11 +82,8 @@ class ShopListAdapter : ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder
     }
 
 
-    class ShopItemViewHolder(val view: View) : RecyclerView.ViewHolder(view){
-        val viewName = view.findViewById<TextView>(R.id.nameId)
-        val viewCount = view.findViewById<TextView>(R.id.countId)
-
-    }
+    class ShopItemViewHolder(
+        val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root)
 
     companion object{
 
